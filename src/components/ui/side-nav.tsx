@@ -49,6 +49,12 @@ const menuItems = [
     icon: TargetIcon,
     description: "Metas de ahorro y progreso"
   },
+  {
+    title:"Compromisos Financieros",
+    href: "/dashboard/commitments",
+    icon: TargetIcon,
+    description: "Metas de ahorro y progreso"
+  }
 ]
 
 export function SideNav() {
