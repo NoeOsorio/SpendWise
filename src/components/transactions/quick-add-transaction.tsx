@@ -19,6 +19,12 @@ interface TransactionPreview {
   description: string
 }
 
+const examples = [
+  "Gasté $350 en el super",
+  "Recibí $15000 de nómina",
+  "Pagué $3500 de renta",
+]
+
 export function QuickAddTransaction() {
   const [open, setOpen] = React.useState(false)
   const [input, setInput] = React.useState("")
@@ -89,8 +95,8 @@ export function QuickAddTransaction() {
         onClick={() => setOpen(true)}
       >
         <Plus className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">Quick Add</span>
-        <span className="inline-flex lg:hidden">Add</span>
+        <span className="hidden lg:inline-flex">Agregar Gasto</span>
+        <span className="inline-flex lg:hidden">Agregar</span>
         <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span className="text-xs">⌘</span>K
         </kbd>
@@ -98,13 +104,13 @@ export function QuickAddTransaction() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
+            <DialogTitle>Agregar Transacción</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Input
                 ref={inputRef}
-                placeholder="Describe your transaction (e.g. 'Spent $50 on groceries')"
+                placeholder="Describe tu gasto (ej: 'Gasté $350 en el super')"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
@@ -112,7 +118,7 @@ export function QuickAddTransaction() {
                 className="text-lg"
               />
               <p className="text-sm text-muted-foreground">
-                Press Enter to process the transaction
+                Presiona Enter para procesar
               </p>
             </div>
 
@@ -125,7 +131,7 @@ export function QuickAddTransaction() {
             {preview && (
               <div className="rounded-lg border bg-card p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Preview</h3>
+                  <h3 className="font-semibold">Vista Previa</h3>
                   <div className={cn(
                     "flex items-center font-medium",
                     preview.type === "income" ? "text-emerald-500" : "text-red-500"
@@ -135,16 +141,16 @@ export function QuickAddTransaction() {
                     ) : (
                       <ArrowDownIcon className="mr-1 h-4 w-4" />
                     )}
-                    ${preview.amount.toFixed(2)}
+                    ${preview.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Category:</span>
+                    <span className="text-muted-foreground">Categoría:</span>
                     <span className="font-medium">{preview.category}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Description:</span>
+                    <span className="text-muted-foreground">Descripción:</span>
                     <span className="font-medium">{preview.description}</span>
                   </div>
                 </div>
@@ -152,18 +158,18 @@ export function QuickAddTransaction() {
                   className="w-full" 
                   onClick={handleConfirm}
                 >
-                  Confirm Transaction
+                  Confirmar Transacción
                 </Button>
               </div>
             )}
 
             {!isProcessing && !preview && (
               <div className="text-sm text-muted-foreground space-y-2">
-                <p className="font-medium">Examples:</p>
+                <p className="font-medium">Ejemplos:</p>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Spent $25 on lunch at Subway</li>
-                  <li>Received $1000 salary payment</li>
-                  <li>Paid $800 for rent</li>
+                  {examples.map((example, index) => (
+                    <li key={index}>{example}</li>
+                  ))}
                 </ul>
               </div>
             )}

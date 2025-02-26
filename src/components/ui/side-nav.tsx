@@ -5,37 +5,49 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboardIcon,
-  LineChartIcon,
-  GoalIcon,
-  SettingsIcon,
+  PieChartIcon,
+  ClockIcon,
+  TrendingUpIcon,
   BellIcon,
+  TargetIcon,
 } from "lucide-react"
 
 const menuItems = [
   {
-    title: "Dashboard",
+    title: "Balance General",
     href: "/dashboard",
     icon: LayoutDashboardIcon,
+    description: "Resumen de saldo, ingresos y gastos"
   },
   {
-    title: "Analytics",
-    href: "/dashboard/analytics",
-    icon: LineChartIcon,
+    title: "Categorías",
+    href: "/dashboard/categories",
+    icon: PieChartIcon,
+    description: "Análisis de gastos por categoría"
   },
   {
-    title: "Goals",
-    href: "/dashboard/goals",
-    icon: GoalIcon,
+    title: "Historial",
+    href: "/dashboard/history",
+    icon: ClockIcon,
+    description: "Historial de transacciones"
   },
   {
-    title: "Notifications",
-    href: "/dashboard/notifications",
+    title: "Proyecciones",
+    href: "/dashboard/forecast",
+    icon: TrendingUpIcon,
+    description: "Predicción de gastos con IA"
+  },
+  {
+    title: "Alertas",
+    href: "/dashboard/alerts",
     icon: BellIcon,
+    description: "Notificaciones y recomendaciones"
   },
   {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: SettingsIcon,
+    title: "Objetivos",
+    href: "/dashboard/goals",
+    icon: TargetIcon,
+    description: "Metas de ahorro y progreso"
   },
 ]
 
@@ -54,6 +66,7 @@ export function SideNav() {
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent",
               pathname === item.href ? "bg-accent" : "transparent"
             )}
+            title={item.description}
           >
             <Icon className="h-4 w-4" />
             <span>{item.title}</span>

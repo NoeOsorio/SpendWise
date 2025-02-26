@@ -2,55 +2,73 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "framer-motion"
+import { formatCurrency } from "@/lib/utils"
 
-interface ExpenseCategory {
+interface TopExpense {
   category: string
   amount: number
   percentage: number
   color: string
+  trend: number // porcentaje de cambio vs mes anterior
 }
 
-const topExpenses: ExpenseCategory[] = [
+const topExpenses: TopExpense[] = [
   {
-    category: "Rent",
-    amount: 800,
-    percentage: 57,
-    color: "hsl(var(--chart-2))"
+    category: "Vivienda",
+    amount: 8000,
+    percentage: 48,
+    color: "hsl(var(--chart-2))",
+    trend: -5
   },
   {
-    category: "Food",
-    amount: 150,
-    percentage: 11,
-    color: "hsl(var(--chart-1))"
+    category: "Alimentación",
+    amount: 3500,
+    percentage: 21,
+    color: "hsl(var(--chart-1))",
+    trend: 10
   },
   {
-    category: "Utilities",
-    amount: 200,
-    percentage: 14,
-    color: "hsl(var(--chart-4))"
+    category: "Transporte",
+    amount: 2000,
+    percentage: 12,
+    color: "hsl(var(--chart-3))",
+    trend: 0
   },
 ]
 
-export function TopExpenses() {
+ function TopExpenses() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top Expenses</CardTitle>
+        <CardTitle>Top 3 Categorías</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {topExpenses.map((expense, index) => (
             <motion.div
               key={expense.category}
-              className="flex items-center gap-4"
+              className="space-y-2"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <div
-                className="h-2 flex-1 rounded-full bg-muted"
-                style={{ position: 'relative' }}
-              >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: expense.color }} 
+                  />
+                  <span className="font-medium">{expense.category}</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">{formatCurrency(expense.amount)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {expense.trend > 0 && '+'}
+                    {expense.trend}% vs mes anterior
+                  </p>
+                </div>
+              </div>
+              <div className="relative h-2 rounded-full bg-muted overflow-hidden">
                 <motion.div
                   className="absolute h-full rounded-full"
                   style={{ backgroundColor: expense.color }}
@@ -59,14 +77,12 @@ export function TopExpenses() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 />
               </div>
-              <div className="w-20 text-right">
-                <p className="font-medium">{expense.category}</p>
-                <p className="text-sm text-muted-foreground">${expense.amount}</p>
-              </div>
             </motion.div>
           ))}
         </div>
       </CardContent>
     </Card>
   )
-} 
+}
+
+export { TopExpenses } 

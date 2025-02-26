@@ -15,11 +15,11 @@ export default function DashboardPage() {
         </div>
         <div className="space-y-8">
           <section>
-            <h2 className="text-3xl font-bold tracking-tight mb-6">Add Transaction</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-6">Agregar Transacción</h2>
             <TransactionInput />
           </section>
           <section>
-            <h2 className="text-3xl font-bold tracking-tight mb-6">Recent Transactions</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-6">Transacciones Recientes</h2>
             <TransactionList />
           </section>
         </div>

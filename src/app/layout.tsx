@@ -5,8 +5,15 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Finance AI",
-  description: "Manage your finances with AI",
+  title: "FinanzAI - Control de Gastos Inteligente",
+  description: "Gestiona tus finanzas personales de manera inteligente con ayuda de IA",
+  keywords: "finanzas personales, control de gastos, presupuesto, méxico, inteligencia artificial",
+  openGraph: {
+    title: "FinanzAI - Control de Gastos Inteligente",
+    description: "Gestiona tus finanzas personales de manera inteligente con ayuda de IA",
+    locale: "es-MX",
+  },
+  language: "es-MX",
 }
 
 export default function RootLayout({
@@ -15,14 +22,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es-MX" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="system">
           {children}
         </ThemeProvider>
       </body>
