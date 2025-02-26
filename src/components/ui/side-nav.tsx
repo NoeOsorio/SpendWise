@@ -38,8 +38,8 @@ const menuItems = [
     description: "Predicción de gastos con IA"
   },
   {
-    title: "Alertas",
-    href: "/dashboard/alerts",
+    title: "Analisis IA",
+    href: "/dashboard/report",
     icon: BellIcon,
     description: "Notificaciones y recomendaciones"
   },

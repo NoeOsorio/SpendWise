@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
 import { 
@@ -8,8 +8,6 @@ import {
   TrendingUp, Bell, CheckCircle2, Clock, Star
 } from "lucide-react"
 import { useState } from "react"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { GoalForm } from "@/components/goals/goal-form"
 
