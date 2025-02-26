@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, TrendingUp, TrendingDown } from "lucide-react"
+import { AlertCircle, TrendingDown } from "lucide-react"
 
 export default function AlertsPage() {
   return (
