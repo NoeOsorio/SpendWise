@@ -1,147 +1,108 @@
 "use client"
 
-import dynamic from 'next/dynamic'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
+import { motion } from "framer-motion"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react"
 
-const ResponsiveLine = dynamic(() => import('@nivo/line').then(mod => mod.ResponsiveLine), {
-  ssr: false,
-  loading: () => <div className="h-[300px] flex items-center justify-center">Cargando gráfica...</div>
-})
+const categories = ["Vivienda", "Alimentación", "Transporte"]
 
-const data = [
-  {
-    id: "Vivienda",
-    data: [
-      { x: "Ene", y: 7500 },
-      { x: "Feb", y: 7800 },
-      { x: "Mar", y: 8000 },
-    ]
-  },
-  {
-    id: "Alimentación",
-    data: [
-      { x: "Ene", y: 2800 },
-      { x: "Feb", y: 3200 },
-      { x: "Mar", y: 3500 },
-    ]
-  },
-  {
-    id: "Transporte",
-    data: [
-      { x: "Ene", y: 2500 },
-      { x: "Feb", y: 2200 },
-      { x: "Mar", y: 2000 },
-    ]
-  }
-]
-
-const colors = {
-  Vivienda: "hsl(var(--chart-2))",
-  Alimentación: "hsl(var(--chart-1))",
-  Transporte: "hsl(var(--chart-3))"
+const data = {
+  Vivienda: [
+    { month: "Ene", amount: 7500 },
+    { month: "Feb", amount: 7800 },
+    { month: "Mar", amount: 8000 },
+    { month: "Abr", amount: 7900 },
+    { month: "May", amount: 8200 },
+    { month: "Jun", amount: 8100 }
+  ],
+  Alimentación: [
+    { month: "Ene", amount: 3200 },
+    { month: "Feb", amount: 3500 },
+    { month: "Mar", amount: 3300 },
+    { month: "Abr", amount: 3800 },
+    { month: "May", amount: 3600 },
+    { month: "Jun", amount: 3400 }
+  ],
+  Transporte: [
+    { month: "Ene", amount: 2000 },
+    { month: "Feb", amount: 1800 },
+    { month: "Mar", amount: 2200 },
+    { month: "Abr", amount: 1900 },
+    { month: "May", amount: 2100 },
+    { month: "Jun", amount: 2000 }
+  ]
 }
 
 export function CategoryTrends() {
+  const [selectedCategory, setSelectedCategory] = useState(categories[0])
+  
+  const monthlyData = data[selectedCategory as keyof typeof data]
+  const average = monthlyData.reduce((sum, item) => sum + item.amount, 0) / monthlyData.length
+  const maxAmount = Math.max(...monthlyData.map(d => d.amount))
+
   return (
-    <Card className="overflow-hidden">
-      <CardHeader>
-        <CardTitle>Tendencias por Categoría</CardTitle>
+    <Card>
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-between">
+          <CardTitle>Evolución Mensual</CardTitle>
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Promedio mensual: {formatCurrency(average)}
+        </p>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveLine
-            data={data}
-            margin={{ top: 30, right: 120, bottom: 50, left: 70 }}
-            xScale={{ type: 'point' }}
-            yScale={{ 
-              type: 'linear',
-              min: 0,
-              max: 'auto',
-              stacked: false,
-              reverse: false
-            }}
-            curve="monotoneX"
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              format: value => formatCurrency(value as number)
-            }}
-            colors={d => colors[d.id as keyof typeof colors]}
-            pointSize={8}
-            pointColor="white"
-            pointBorderWidth={2}
-            pointBorderColor={{ from: 'serieColor' }}
-            pointLabelYOffset={-12}
-            enableArea={true}
-            areaBaselineValue={0}
-            areaOpacity={0.15}
-            useMesh={true}
-            enableSlices="x"
-            crosshairType="cross"
-            legends={[
-              {
-                anchor: 'right',
-                direction: 'column',
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: 'left-to-right',
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: 'circle',
-                symbolBorderColor: 'rgba(0, 0, 0, .5)',
-              }
-            ]}
-            theme={{
-              axis: {
-                ticks: {
-                  text: {
-                    fill: 'hsl(var(--foreground))',
-                    fontSize: 11
-                  }
-                }
-              },
-              grid: {
-                line: {
-                  stroke: 'hsl(var(--border))',
-                  strokeWidth: 1,
-                  strokeDasharray: '4 4'
-                }
-              },
-              crosshair: {
-                line: {
-                  stroke: 'hsl(var(--foreground))',
-                  strokeWidth: 1,
-                  strokeOpacity: 0.35
-                }
-              },
-              tooltip: {
-                container: {
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  fontSize: '12px',
-                  borderRadius: '6px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }
-              }
-            }}
-          />
+        <div className="space-y-4">
+          <div className="grid grid-cols-6 gap-2 h-[200px] items-end relative pt-4">
+            {/* Línea promedio */}
+            <div 
+              className="absolute w-full border-t border-dashed border-muted-foreground/50"
+              style={{ 
+                bottom: `${(average / maxAmount) * 100}%`,
+              }}
+            />
+            {monthlyData.map((data, i) => (
+              <div key={data.month} className="relative h-full flex flex-col justify-end">
+                <motion.div 
+                  className={`w-full bg-primary transition-all ${
+                    data.amount > average ? "opacity-100" : "opacity-50"
+                  }`}
+                  style={{ 
+                    height: `${(data.amount / maxAmount) * 100}%`,
+                    borderTopLeftRadius: '4px',
+                    borderTopRightRadius: '4px'
+                  }}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${(data.amount / maxAmount) * 100}%` }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                />
+                <div className="text-center text-sm mt-2">
+                  <div className="font-medium">{data.month}</div>
+                  <div className="text-muted-foreground">
+                    {formatCurrency(data.amount)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-muted-foreground text-center">
+            Las barras más oscuras indican gastos por encima del promedio
+          </div>
         </div>
       </CardContent>
     </Card>
   )
-}
-
-export { CategoryTrends } 
+} 
