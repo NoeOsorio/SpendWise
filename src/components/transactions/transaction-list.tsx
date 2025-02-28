@@ -12,11 +12,9 @@ import {
   SearchIcon, 
   CalendarIcon,
   FilterIcon,
-  MoreVerticalIcon
 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { motion, AnimatePresence } from "framer-motion"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,15 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-
-interface Transaction {
-  id: string
-  description: string
-  amount: number
-  type: "income" | "expense"
-  category: string
-  date: Date
-}
+import { useTransactions } from "@/hooks/use-transactions"
+import { toast } from "sonner"
+import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 
 const timeFilters = [
   { label: "Hoy", value: "today" },
@@ -43,30 +35,20 @@ const timeFilters = [
 export function TransactionList() {
   const [search, setSearch] = useState("")
   const [timeFilter, setTimeFilter] = useState("month")
-  const [transactions] = useState<Transaction[]>([
-    {
-      id: "1",
-      description: "Depósito de nómina",
-      amount: 15000,
-      type: "income",
-      category: "Ingresos",
-      date: new Date(2024, 2, 15)
-    },
-    {
-      id: "2",
-      description: "Supermercado",
-      amount: 1250.50,
-      type: "expense",
-      category: "Alimentación",
-      date: new Date(2024, 2, 14)
-    },
-    // ... más transacciones
-  ])
+  const { transactions, isLoading, error, loadTransactions } = useTransactions()
+  const [dialog, setDialog] = useState<string | null>(null)
+
+  // Mostrar error si existe
+  if (error) {
+    toast.error(error)
+  }
 
   const filteredTransactions = transactions.filter(tx => 
     tx.description.toLowerCase().includes(search.toLowerCase()) ||
-    tx.category.toLowerCase().includes(search.toLowerCase())
+    tx.categoryName.toLowerCase().includes(search.toLowerCase())
   )
+
+  if (isLoading) return <div>Cargando...</div>
 
   return (
     <Card>
@@ -112,72 +94,67 @@ export function TransactionList() {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px] pr-4">
-          <AnimatePresence initial={false}>
-            {filteredTransactions.map((transaction) => (
-              <motion.div
-                key={transaction.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                className="flex items-center justify-between p-4 rounded-lg mb-2 hover:bg-muted/50 transition-colors group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-full ${
-                    transaction.type === "income" 
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" 
-                      : "bg-rose-100 text-rose-700 dark:bg-rose-900/30"
-                  }`}>
-                    {transaction.type === "income" ? (
-                      <ArrowUpIcon className="h-4 w-4" />
-                    ) : (
-                      <ArrowDownIcon className="h-4 w-4" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">{transaction.description}</p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Badge variant="secondary" className="rounded-sm">
-                        {transaction.category}
-                      </Badge>
-                      <span>•</span>
-                      <div className="flex items-center gap-1">
-                        <CalendarIcon className="h-3 w-3" />
-                        {format(transaction.date, "d MMM", { locale: es })}
+          {filteredTransactions.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No hay transacciones que mostrar
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredTransactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-full ${
+                      transaction.type === "income" 
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" 
+                        : "bg-rose-100 text-rose-700 dark:bg-rose-900/30"
+                    }`}>
+                      {transaction.type === "income" ? (
+                        <ArrowUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ArrowDownIcon className="h-4 w-4" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{transaction.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Badge variant="secondary" className="rounded-sm">
+                          {transaction.categoryName}
+                        </Badge>
+                        <span>•</span>
+                        <div className="flex items-center gap-1">
+                          <CalendarIcon className="h-3 w-3" />
+                          {format(new Date(transaction.created_at), "d MMM", { locale: es })}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
                   <span className={`font-medium ${
                     transaction.type === "income" ? "text-emerald-600" : "text-rose-600"
                   }`}>
                     {transaction.type === "income" ? "+" : "-"}
                     {formatCurrency(transaction.amount)}
                   </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100"
-                      >
-                        <MoreVerticalIcon className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              ))}
+            </div>
+          )}
         </ScrollArea>
       </CardContent>
+      <TransactionDialog 
+        type="income"
+        open={dialog === 'income'}
+        onOpenChange={(open) => setDialog(open ? 'income' : null)}
+        onSuccess={loadTransactions}
+      />
+      <TransactionDialog 
+        type="expense"
+        open={dialog === 'expense'}
+        onOpenChange={(open) => setDialog(open ? 'expense' : null)}
+        onSuccess={loadTransactions}
+      />
     </Card>
   )
 } 

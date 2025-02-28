@@ -4,15 +4,13 @@ import { BalanceCard } from "./balance-card"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, MinusIcon } from "lucide-react"
 import { useState } from "react"
-import { QuickAddDialog } from "@/components/transactions/quick-add-dialog"
+import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 
 export function BalanceOverview() {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [transactionType, setTransactionType] = useState<"income" | "expense">("expense")
+  const [dialog, setDialog] = useState<'income' | 'expense' | null>(null)
 
-  const handleQuickAdd = (type: "income" | "expense") => {
-    setTransactionType(type)
-    setIsAddDialogOpen(true)
+  const handleSuccess = () => {
+    // Aquí podrías actualizar el balance si lo necesitas
   }
 
   return (
@@ -23,7 +21,7 @@ export function BalanceOverview() {
           <Button 
             variant="outline" 
             className="text-emerald-600 border-emerald-600/20 hover:bg-emerald-50"
-            onClick={() => handleQuickAdd("income")}
+            onClick={() => setDialog('income')}
           >
             <PlusIcon className="mr-2 h-4 w-4" />
             Ingreso
@@ -31,7 +29,7 @@ export function BalanceOverview() {
           <Button 
             variant="outline"
             className="text-red-600 border-red-600/20 hover:bg-red-50"
-            onClick={() => handleQuickAdd("expense")}
+            onClick={() => setDialog('expense')}
           >
             <MinusIcon className="mr-2 h-4 w-4" />
             Gasto
@@ -66,10 +64,17 @@ export function BalanceOverview() {
         />
       </div>
 
-      <QuickAddDialog 
-        open={isAddDialogOpen} 
-        onOpenChange={setIsAddDialogOpen}
-        type={transactionType}
+      <TransactionDialog
+        type="income"
+        open={dialog === 'income'}
+        onOpenChange={(open) => setDialog(open ? 'income' : null)}
+        onSuccess={handleSuccess}
+      />
+      <TransactionDialog
+        type="expense"
+        open={dialog === 'expense'}
+        onOpenChange={(open) => setDialog(open ? 'expense' : null)}
+        onSuccess={handleSuccess}
       />
     </section>
   )
