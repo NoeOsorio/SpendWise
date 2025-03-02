@@ -1,87 +1,123 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ArrowDownIcon, ArrowUpIcon, CalendarIcon } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipTrigger,
+  TooltipProvider 
+} from "@/components/ui/tooltip"
 
 interface BalanceCardProps {
   title: string
   amount: number
   percentage: number
-  type: "income" | "expense" | "balance"
+  type: 'balance' | 'income' | 'expense'
   previousAmount: number
   lastUpdate: string
 }
 
-export function BalanceCard({ 
-  title, 
-  amount, 
-  percentage, 
-  type,
-  previousAmount,
-  lastUpdate
-}: BalanceCardProps) {
+export function BalanceCard({ title, amount, percentage, type, previousAmount, lastUpdate }: BalanceCardProps) {
+  const formattedPercentage = percentage.toFixed(2)
   const isPositive = percentage > 0
-  const formattedAmount = new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'MXN',
-  }).format(amount)
-  
+  const date = new Date(lastUpdate)
+
+  const getCardStyles = () => {
+    switch (type) {
+      case 'balance':
+        return isPositive 
+          ? 'border-l-emerald-500 bg-emerald-50/30 dark:bg-emerald-500/5' 
+          : 'border-l-red-500 bg-red-50/30 dark:bg-red-500/5'
+      case 'income':
+        return 'border-l-emerald-500 bg-emerald-50/30 dark:bg-emerald-500/5'
+      case 'expense':
+        return 'border-l-red-500 bg-red-50/30 dark:bg-red-500/5'
+    }
+  }
+
+  const getPercentageColor = () => {
+    if (type === 'expense') {
+      return isPositive ? 'text-red-600' : 'text-emerald-600'
+    }
+    return isPositive ? 'text-emerald-600' : 'text-red-600'
+  }
+
+  const getIconStyles = () => {
+    if (type === 'balance') {
+      return isPositive 
+        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' 
+        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+    }
+    return type === 'income'
+      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+  }
+
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card className={cn(
-              "relative overflow-hidden transition-colors hover:bg-muted/50 cursor-help",
-              type === "balance" && "bg-primary/5",
-              type === "income" && "bg-emerald-50 dark:bg-emerald-950/20",
-              type === "expense" && "bg-red-50 dark:bg-red-950/20"
-            )}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                {isPositive ? (
-                  <ArrowUpIcon className="h-4 w-4 text-emerald-500" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-500" />
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formattedAmount}
-                </div>
-                <p className={cn(
-                  "text-sm mt-1",
-                  isPositive ? "text-emerald-600" : "text-red-600"
-                )}>
-                  {isPositive ? "+" : ""}{percentage}% vs mes anterior
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {lastUpdate}
-                </p>
-              </CardContent>
-              <div className={cn(
-                "absolute inset-y-0 right-0 w-1",
-                type === "balance" && "bg-primary",
-                type === "income" && "bg-emerald-500",
-                type === "expense" && "bg-red-500"
-              )} />
-            </Card>
-          </motion.div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Mes anterior: {new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'MXN',
-          }).format(previousAmount)}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className={`
+      rounded-lg border border-l-4 p-6 
+      transition-all duration-300
+      hover:scale-[1.02] hover:shadow-lg hover:shadow-muted/10
+      cursor-default 
+      ${getCardStyles()}
+    `}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">{title}</p>
+        <div className={`
+          rounded-full p-1.5
+          transition-all duration-300
+          group
+          hover:scale-110
+          hover:shadow-sm
+          ${getIconStyles()}
+        `}>
+          {isPositive ? (
+            <div className="relative">
+              <ArrowUpIcon className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-[2px]" />
+              <div className="absolute inset-0 animate-ping opacity-30">
+                <ArrowUpIcon className="h-4 w-4" />
+              </div>
+            </div>
+          ) : (
+            <div className="relative">
+              <ArrowDownIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-[2px]" />
+              <div className="absolute inset-0 animate-ping opacity-30">
+                <ArrowDownIcon className="h-4 w-4" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <h3 className="text-2xl font-bold tracking-tight">{formatCurrency(amount)}</h3>
+        <div className="mt-2 flex items-center gap-2">
+          <div className={`flex items-center text-xs font-medium ${getPercentageColor()}`}>
+            {Math.abs(Number(formattedPercentage))}%
+          </div>
+          <span className="text-xs text-muted-foreground">vs mes anterior</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+        <span>Mes anterior: {formatCurrency(previousAmount)}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex items-center gap-1 text-xs hover:text-foreground transition-colors">
+                <CalendarIcon className="h-3 w-3" />
+                <span>{format(date, "d MMM", { locale: es })}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Última actualización</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
   )
 } 
