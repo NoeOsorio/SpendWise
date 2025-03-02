@@ -1,28 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
-
-interface TransactionWithCategory {
-  id: string
-  user_id: string
-  amount: number
-  type: "income" | "expense"
-  category_id: number
-  description: string
-  created_at: string
-  category: {
-    id: number
-    name: string
-    type: "income" | "expense"
-  }
-}
-
-export interface TransactionDisplay {
-  id: string
-  amount: number
-  type: "income" | "expense"
-  description: string
-  categoryName: string
-  created_at: string
-}
+import { TransactionDisplay, TransactionWithCategory, TransactionAIResponse } from '@/types/transaction'
+import { categoriesService } from '@/services/categories'
 
 export const transactionsService = {
   async getTransactions(): Promise<TransactionDisplay[]> {
@@ -79,7 +57,15 @@ export const transactionsService = {
     amount: number
     description: string
     category_id: string
-    user_id: string
+    user_id: string,
+    date?: string
+    location?: string
+    notes?: string
+    attachments?: string[]
+    tags?: string[]
+    is_recurring: boolean
+    recurring_id?: string
+    created_at?: string
   }) {
     const supabase = createClient()
     
@@ -91,5 +77,25 @@ export const transactionsService = {
       })
 
     if (error) throw error
+  },
+
+  async parseTransactionText(text: string): Promise<TransactionAIResponse> {
+    const response = await fetch('/api/ai/parse-transaction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text })
+    })
+
+    if (!response.ok) {
+      throw new Error('Error al procesar el texto')
+    }
+
+    return response.json()
+  },
+
+  async getCategoryByName(name: string): Promise<string | null> {
+    return categoriesService.getCategoryByName(name)
   }
 } 
