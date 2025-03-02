@@ -1,30 +1,29 @@
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { Category } from '@/types'
+"use client"
 
-export function useCategories() {
-  const [categories, setCategories] = useState<Array<Category>>([])
+import { useEffect, useState } from "react"
+import { TransactionCategory, TransactionType } from "@/types/transaction"
+import { categoriesService } from "@/services/categories"
+
+export function useCategories(type?: TransactionType) {
+  const [categories, setCategories] = useState<TransactionCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const loadCategories = async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name')
+    if (!type) return
 
-      if (error) {
-        setError(error.message)
-      } else {
-        setCategories(data || [])
+    const loadCategories = async () => {
+      try {
+        const data = await categoriesService.getCategories(type)
+        setCategories(data)
+      } catch (error) {
+        console.error('Error loading categories:', error)
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
 
     loadCategories()
-  }, [])
+  }, [type])
 
-  return { categories, isLoading, error }
+  return { categories, isLoading }
 } 

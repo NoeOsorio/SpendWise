@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { transactionsService, TransactionDisplay } from '@/services/transactions'
+import { useState, useEffect, useCallback } from 'react'
+import { transactionsService } from '@/services/transactions'
 import { useAuth } from '@/hooks/use-auth'
+import { TransactionDisplay } from '@/types/transaction'
 
 interface UseTransactionsReturn {
   transactions: TransactionDisplay[]
@@ -21,7 +22,7 @@ export function useTransactions(): UseTransactionsReturn {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -34,7 +35,7 @@ export function useTransactions(): UseTransactionsReturn {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   const createTransaction = async (data: {
     type: 'income' | 'expense'
@@ -46,7 +47,8 @@ export function useTransactions(): UseTransactionsReturn {
       const user = await getCurrentUser()
       await transactionsService.createTransaction({
         ...data,
-        user_id: user.id
+        user_id: user.id,
+        is_recurring: false
       })
       await loadTransactions()
     } catch (e) {
@@ -57,8 +59,11 @@ export function useTransactions(): UseTransactionsReturn {
 
   useEffect(() => {
     loadTransactions()
-    return transactionsService.subscribeToChanges(loadTransactions)
-  }, [])
+    const unsubscribe = transactionsService.subscribeToChanges(() => {
+      loadTransactions()
+    })
+    return () => unsubscribe()
+  }, [loadTransactions])
 
   return {
     transactions,

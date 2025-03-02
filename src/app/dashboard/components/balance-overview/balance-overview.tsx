@@ -5,8 +5,7 @@ import { useBalance } from "@/hooks/use-balance"
 import { BalanceCard } from "./balance-card"
 import { BalanceHeader } from "./balance-header"
 import { BalanceOverviewSkeleton } from "./balance-overview-skeleton"
-import { TransactionDialogs } from "./transaction-dialogs"
-
+import { TransactionDialogs } from "@/components/transactions/transaction-dialogs"
 export function BalanceOverview() {
   const { balance, isLoading, reloadBalance } = useBalance()
   const [dialog, setDialog] = useState<'income' | 'expense' | null>(null)
@@ -14,8 +13,6 @@ export function BalanceOverview() {
   if (isLoading || !balance) {
     return <BalanceOverviewSkeleton />
   }
-
-  console.log(balance)
   return (
     <section className="space-y-6">
       <BalanceHeader 

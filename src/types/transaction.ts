@@ -39,6 +39,10 @@ export interface TransactionAIResponse {
 export interface TransactionInputProps {
   onSuccess?: () => void
   onCancel: () => void
+  onPreview: (preview: TransactionAIResponse | null) => void
+  isConfirmMode?: boolean
+  isLoading?: boolean
+  onConfirm?: () => void
 }
 
 export interface TransactionWithCategory {

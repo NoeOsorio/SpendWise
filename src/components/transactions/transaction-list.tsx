@@ -24,7 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useTransactions } from "@/hooks/use-transactions"
 import { toast } from "sonner"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
+
 
 const timeFilters = [
   { label: "Hoy", value: "today" },
@@ -35,8 +35,7 @@ const timeFilters = [
 export function TransactionList() {
   const [search, setSearch] = useState("")
   const [timeFilter, setTimeFilter] = useState("month")
-  const { transactions, isLoading, error, loadTransactions } = useTransactions()
-  const [dialog, setDialog] = useState<string | null>(null)
+  const { transactions, isLoading, error } = useTransactions()
 
   // Mostrar error si existe
   if (error) {
@@ -143,18 +142,7 @@ export function TransactionList() {
           )}
         </ScrollArea>
       </CardContent>
-      <TransactionDialog 
-        type="income"
-        open={dialog === 'income'}
-        onOpenChange={(open) => setDialog(open ? 'income' : null)}
-        onSuccess={loadTransactions}
-      />
-      <TransactionDialog 
-        type="expense"
-        open={dialog === 'expense'}
-        onOpenChange={(open) => setDialog(open ? 'expense' : null)}
-        onSuccess={loadTransactions}
-      />
+   
     </Card>
   )
 } 

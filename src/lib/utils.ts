@@ -11,3 +11,7 @@ export function formatCurrency(amount: number): string {
     currency: 'MXN',
   }).format(amount)
 }
+
+export function parseCurrency(value: string): number {
+  return Number(value.replace(/[^0-9.-]+/g, ''))
+}

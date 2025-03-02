@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             "date": string (requerido, en formato ISO con la lógica mencionada),
             "location": string | null (lugar donde ocurrió la transacción),
             "notes": string | null (detalles adicionales o contexto),
-            "tags": string[] | null (palabras clave relacionadas)
+            "tags": string[] (al menos 3 palabras clave relacionadas)
           }`
         },
         {
