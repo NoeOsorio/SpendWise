@@ -38,7 +38,7 @@ const toastVariants = cva(
 )
 
 export interface ToastProps
-  extends React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>,
+  extends Omit<React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>, "title">,
     VariantProps<typeof toastVariants> {
   title?: React.ReactNode
   description?: React.ReactNode
@@ -50,7 +50,8 @@ export type ToastActionElement = React.ReactElement<typeof ToastAction>
 export const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   ToastProps
->(({ className, variant, ...props }, ref) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+>(({ className, variant, title, description, action, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}
